@@ -87,16 +87,6 @@
 (setq org-mobile-inbox-for-pull "~/Dropbox/org/flagged.org")
 (setq org-mobile-directory "~/Dropbox/MobileOrg")
 
-;; https://github.com/rileyrg/org-googlecl
-;; http://kikukawatei.blogspot.com/2011/01/org-googleclel-blogger_4570.html
-;; can't use non-ascii characters in blogname?
-(require 'org-googlecl)
-(setq googlecl-blogname "diary.y4su0.com")
-(setq googlecl-username "y4su0@y4su0.com")
-(setq googlecl-default-labels nil)
-(setq googlecl-footer
-      "<br />-- <br />Posted with <a href=\"https://github.com/rileyrg/org-googlecl\">org-googlecl.el</a>")
-
 ;; for w3m
 (require 'w3m-load)
 
