@@ -10,9 +10,12 @@
 (setenv "PATH"
 	(concat '"/usr/local/bin:" (getenv "PATH")))
 
-(add-to-list 'load-path "~/Dropbox/elisp/")
-(add-to-list 'load-path "~/Dropbox/elisp/org-7.8.11/lisp")
-(add-to-list 'load-path "~/Dropbox/elisp/w3m")
+(setq load-path
+      (append (list
+	       (expand-file-name "~/Dropbox/elisp/")
+;;	       (expand-file-name "~/Dropbox/elisp/w3m")
+	       (expand-file-name "~/Dropbox/elisp/org-8.3.3/lisp"))
+	      load-path))
 
 ;; cf. http://macemacsjp.sourceforge.jp/index.php?MacFontSetting#h3b01bb4
 (create-fontset-from-ascii-font "Menlo-14:weight=normal:slant=normal" nil "menlokakugo")
@@ -23,31 +26,42 @@
 (add-to-list 'face-font-rescale-alist '(".*Hiragino.*" . 1.2))
 (add-to-list 'face-font-rescale-alist '(".*Menlo.*" . 1.0))
 
-(add-to-list 'initial-frame-alist '(font . "fontset-menlokakugo"))
-(add-to-list 'initial-frame-alist '(cursor-type . (bar . 3)))
+;; http://d.hatena.ne.jp/setoryohei/20110117/1295336454
+(set-face-font 'default "fontset-menlokakugo")
 
 ;; machine-specific settings
 (when (equal system-name "iMac.local")
-  (add-to-list 'initial-frame-alist '(width . 120))
-  (add-to-list 'initial-frame-alist '(height . 50))
-  (add-to-list 'initial-frame-alist '(top . 300))
-  (add-to-list 'initial-frame-alist '(left . 1200)))
+  (setq initial-frame-alist
+	(append (list
+		 '(width . 120)
+		 '(height . 50)
+		 '(top . 300)
+		 '(left . 1200)
+		 '(cursor-type . (bar . 3))))))
 
 (when (equal system-name "MacBook-Air.local")
-  (add-to-list 'initial-frame-alist '(width . 120))
-  (add-to-list 'initial-frame-alist '(height . 36))
-  (add-to-list 'initial-frame-alist '(top . 30))
-  (add-to-list 'initial-frame-alist '(left . 10)))
+  (setq initial-frame-alist
+	(append (list
+		 '(width . 120)
+		 '(height . 36)
+		 '(top . 30)
+		 '(left . 10)
+		 '(cusor-type . (bar . 3))))))
 
 (setq default-frame-alist initial-frame-alist)
 (tool-bar-mode 0)
 (setq initial-scratch-message "")
 
-;; http://d.hatena.ne.jp/setoryohei/20110117/1295336454
-(set-face-font 'default "fontset-menlokakugo")
+(defvar my/bg-color "#fffff0")
+(defvar my/fg-color "grey25")
 
-(set-cursor-color "Gray35")
-(blink-cursor-mode t)
+(set-face-attribute 'default t
+                    :background my/bg-color
+		    :foreground my/fg-color)
+(set-face-attribute 'cursor t
+		    :background "grey30")
+
+(blink-cursor-mode 0)
 
 (setq ring-bell-function '(lambda())) ;; no beep
 (font-lock-mode t)
@@ -73,8 +87,8 @@
 ;; http://molekun.blogspot.com/2011/03/homebrewemacs233.html
 ;;(add-hook 'minibuffer-setup-hook 'mac-change-language-to-us)
 
-
-(add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(add-to-list 'auto-mode-alist
+	     '("\\.org$" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-ca" 'org-agenda)
@@ -88,7 +102,75 @@
 (setq org-mobile-directory "~/Dropbox/MobileOrg")
 
 ;; for w3m
-(require 'w3m-load)
+;; (require 'w3m-load)
 
 ;; for twittering-mode
-(require 'twittering-mode)
+;; (require 'twittering-mode)
+
+;;; *scratch* buffer
+(defun my-make-scratch (&optional arg)
+  (interactive)
+  (progn
+    ;; make "*scratch*" buffer at buffer-list
+    (set-buffer (get-buffer-create "*scratch*"))
+    (funcall initial-major-mode)
+    (erase-buffer)
+    (when (and initial-scratch-message (not inhibit-startup-message))
+      (insert initial-scratch-message))
+    (or arg (progn (setq arg 0)
+		   (switch-to-buffer "*scratch*")))
+    (cond ((= arg 0) (message "*scratch* is cleared up."))
+	  ((= arg 1) (message "another *scratch* is created")))))
+
+(add-hook 'kill-buffer-query-functions
+	  ;; delete contents when *scratch* buffer is killed
+	  (lambda ()
+	    (if (string= "*scratch*" (buffer-name))
+		(progn (my-make-scratch 0) nil)
+	      t)))
+
+(add-hook 'after-save-hook
+	  ;; new *scratch* buffer after saving *scratch*
+	  (lambda ()
+	    (unless (member (get-buffer "*scratch*") (buffer-list))
+	      (my-make-scratch 1))))
+
+(require 'whitespace)
+
+(global-whitespace-mode 1)
+
+(setq whitespace-line-column 200
+      whitespace-style '(face
+			 tabs newline
+			 tab-mark newline-mark))
+
+(set-face-attribute 'whitespace-tab nil
+		    :foreground "LightSkyBlue"
+		    :background my/bg-color)
+(set-face-attribute 'whitespace-newline nil
+		    :foreground "LightSkyBlue"
+		    :background my/bg-color)
+
+(which-function-mode t)
+
+(require 'imenu)
+(defcustom imenu-modes
+  '(emacs-lisp-mode c-mode c++-mode makefile-mode)
+  "List of major modes for which Imenu mode should be used."
+  :group 'imenu
+  :type '(choice (const :tag "All modes" t)
+		 (repeat (symbol :tag "Major mode"))))
+(defun my-imenu-ff-hook ()
+  "File find hook for Imenu mode."
+  (if (member major-mode imenu-modes)
+      (imenu-add-to-menubar "imenu")))
+(add-hook 'find-file-hooks 'my-imenu-ff-hook t)
+
+(global-set-key "\C-cg" 'imenu)
+
+(show-paren-mode t)
+(setq show-paren-style 'mixed)
+
+(transient-mark-mode t)
+
+(recentf-mode 1)
