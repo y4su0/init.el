@@ -18,19 +18,16 @@
 	      load-path))
 
 ;; cf. http://macemacsjp.sourceforge.jp/index.php?MacFontSetting#h3b01bb4
-;;(create-fontset-from-ascii-font "Menlo-14:weight=normal:slant=normal" nil "menlokakugo")
-;; (set-fontset-font "fontset-menlokakugo"
-;; 		  'unicode
-;; 		  (font-spec :family "Hiragino Kaku Gothic ProN" )
-;; 		  nil 'append)
-;; (add-to-list 'face-font-rescale-alist '(".*Hiragino.*" . 1.2))
-;; (add-to-list 'face-font-rescale-alist '(".*Menlo.*" . 1.0))
+(create-fontset-from-ascii-font "Menlo-14:weight=normal:slant=normal" nil "menlokakugo")
+(set-fontset-font "fontset-menlokakugo"
+		  'unicode
+		  (font-spec :family "Hiragino Kaku Gothic ProN" )
+		  nil 'append)
+(add-to-list 'face-font-rescale-alist '(".*Hiragino.*" . 1.2))
+(add-to-list 'face-font-rescale-alist '(".*Menlo.*" . 1.0))
 
 ;; http://d.hatena.ne.jp/setoryohei/20110117/1295336454
-
-;;(set-face-font 'default "fontset-menlokakugo")
-;;(set-face-foreground 'default my/fg-color)
-;;(set-face-background 'default my/bg-color)
+(set-face-font 'default "fontset-menlokakugo")
 
 ;; machine-specific settings
 (when (equal system-name "iMac.local")
@@ -52,8 +49,30 @@
 		 '(cusor-type . (bar . 3))))))
 
 (setq default-frame-alist initial-frame-alist)
+(tool-bar-mode 0)
+(setq initial-scratch-message "")
+
+(defvar my/bg-color "#fffff0")
+(defvar my/fg-color "grey25")
+
+(set-face-attribute 'default t
+                    :background my/bg-color
+		    :foreground my/fg-color)
+(set-face-attribute 'cursor t
+		    :background "grey30")
+
+(blink-cursor-mode 0)
 
 (setq ring-bell-function '(lambda())) ;; no beep
+(font-lock-mode t)
+(setq inhibit-startup-message t) ; don't show the startup message
+(setq kill-whole-line t) ; C-k deletes the end of line
+
+(setq auto-save-default nil) ; disable auto-saving
+(setq make-backup-files nil) ; don't make *~
+(setq auto-save-list-file-prefix nil) ; don't make ~/.saves-PID-hostname
+
+(setq calendar-week-start-day 1)
 
 ;; macos specific
 (define-key global-map [ns-drag-file] 'ns-find-file)
@@ -66,7 +85,7 @@
 ;;(mac-add-key-passed-to-system 'shift)
 
 ;; http://molekun.blogspot.com/2011/03/homebrewemacs233.html
-;; (add-hook 'minibuffer-setup-hook 'mac-change-language-to-us)
+;;(add-hook 'minibuffer-setup-hook 'mac-change-language-to-us)
 
 (add-to-list 'auto-mode-alist
 	     '("\\.org$" . org-mode))
@@ -75,7 +94,12 @@
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 
+(setq org-agenda-files "~/Dropbox/org/agenda.org")
+
 ;; http://mobileorg.ncogni.to/doc/getting-started/using-dropbox/
+(setq org-directory "~/Dropbox/org")
+(setq org-mobile-inbox-for-pull "~/Dropbox/org/flagged.org")
+(setq org-mobile-directory "~/Dropbox/MobileOrg")
 
 ;; for w3m
 ;; (require 'w3m-load)
@@ -111,9 +135,27 @@
 	    (unless (member (get-buffer "*scratch*") (buffer-list))
 	      (my-make-scratch 1))))
 
+(require 'whitespace)
+
+(global-whitespace-mode 1)
+
+(setq whitespace-line-column 200
+      whitespace-style '(face
+			 tabs newline
+			 tab-mark newline-mark))
+
+(set-face-attribute 'whitespace-tab nil
+		    :foreground "LightSkyBlue"
+		    :background my/bg-color)
+(set-face-attribute 'whitespace-newline nil
+		    :foreground "LightSkyBlue"
+		    :background my/bg-color)
+
+(which-function-mode t)
+
 (require 'imenu)
 (defcustom imenu-modes
-  '(emacs-lisp-mode c-mode c++-mode makefile-mode org-mode)
+  '(emacs-lisp-mode c-mode c++-mode makefile-mode)
   "List of major modes for which Imenu mode should be used."
   :group 'imenu
   :type '(choice (const :tag "All modes" t)
@@ -126,55 +168,9 @@
 
 (global-set-key "\C-cg" 'imenu)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(auto-save-default nil)
- '(auto-save-list-file-prefix nil)
- '(blink-cursor-blinks 4)
- '(blink-cursor-mode nil)
- '(calendar-week-start-day 1)
- '(display-time-24hr-format t)
- '(display-time-day-and-date t)
- '(display-time-default-load-average nil)
- '(display-time-format "%F %H:%M")
- '(display-time-load-average-threshold 100)
- '(display-time-mode t)
- '(global-whitespace-mode t)
- '(inhibit-startup-screen t)
- '(initial-scratch-message "")
- '(kill-whole-line t)
- '(make-backup-files nil)
- '(org-agenda-files "~/Dropbox/org/agenda.org")
- '(org-directory "~/Dropbox/org")
- '(org-hide-leading-stars t)
- '(org-imenu-depth 3)
- '(org-startup-folded nil)
- '(org-startup-truncated nil)
- '(recentf-mode t)
- '(show-paren-mode t)
- '(show-paren-style (quote mixed))
- '(tool-bar-mode nil)
- '(which-function-mode t)
- '(whitespace-line-column 200)
- '(whitespace-style (quote (face tabs newline tab-mark newline-mark))))
+(show-paren-mode t)
+(setq show-paren-style 'mixed)
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#fffff0" :foreground "grey25" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 140 :width normal :foundry "nil" :family "Menlo"))))
- '(cursor ((t (:background "grey30"))))
- '(org-hide ((t (:foreground "gray75"))))
- '(whitespace-newline ((t (:foreground "LightSkyBlue"))))
- '(whitespace-tab ((t (:foreground "LightSkyBlue")))))
+(transient-mark-mode t)
 
-
-(set-fontset-font (frame-parameter nil 'font)
-                  'japanese-jisx0208
-                  (font-spec :family "Hiragino Kaku Gothic ProN"))
-(add-to-list 'face-font-rescale-alist
-             '(".*Hiragino Kaku Gothic ProN.*" . 1.2))
+(recentf-mode 1)
