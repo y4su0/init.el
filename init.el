@@ -5,32 +5,15 @@
 (setq default-input-method "MacOSX")
 
 ;; http://journal.mycom.co.jp/column/osx/079/index.html
-;; (Add-to-list 'exec-path "/usr/local/bin")
 (setq exec-path (cons "/usr/local/bin" exec-path))
 (setenv "PATH"
 	(concat '"/usr/local/bin:" (getenv "PATH")))
 
 (setq load-path
       (append (list
-	       (expand-file-name "~/Dropbox/elisp/")
-;;	       (expand-file-name "~/Dropbox/elisp/w3m")
-	       (expand-file-name "~/Dropbox/elisp/org-8.3.3/lisp"))
+	       (expand-file-name "~/.emacs.d/elisp/")
+	       (expand-file-name "~/.emacs.d/elisp/org-8.3.3/lisp"))
 	      load-path))
-
-;; cf. http://macemacsjp.sourceforge.jp/index.php?MacFontSetting#h3b01bb4
-;;(create-fontset-from-ascii-font "Menlo-14:weight=normal:slant=normal" nil "menlokakugo")
-;; (set-fontset-font "fontset-menlokakugo"
-;; 		  'unicode
-;; 		  (font-spec :family "Hiragino Kaku Gothic ProN" )
-;; 		  nil 'append)
-;; (add-to-list 'face-font-rescale-alist '(".*Hiragino.*" . 1.2))
-;; (add-to-list 'face-font-rescale-alist '(".*Menlo.*" . 1.0))
-
-;; http://d.hatena.ne.jp/setoryohei/20110117/1295336454
-
-;;(set-face-font 'default "fontset-menlokakugo")
-;;(set-face-foreground 'default my/fg-color)
-;;(set-face-background 'default my/bg-color)
 
 ;; machine-specific settings
 (when (equal system-name "iMac.local")
