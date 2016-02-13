@@ -94,7 +94,12 @@
 	    (unless (member (get-buffer "*scratch*") (buffer-list))
 	      (my-make-scratch 1))))
 
-(require 'imenu)
+(setq frame-title-format
+      '("%b " (:eval (if (buffer-file-name)
+			 (concat "[" (abbreviate-file-name (buffer-file-name)) "]")
+		       "")) "on " system-name))
+
+(Require 'imenu)
 (defcustom imenu-modes
   '(emacs-lisp-mode c-mode c++-mode makefile-mode org-mode)
   "List of major modes for which Imenu mode should be used."
