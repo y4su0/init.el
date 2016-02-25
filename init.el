@@ -95,8 +95,8 @@
 	      (my-make-scratch 1))))
 
 (setq frame-title-format
-      '("%b " (:eval (if (buffer-file-name)
-			 (concat "[" (abbreviate-file-name (buffer-file-name)) "]")
+      '("[%+] %b " (:eval (if (buffer-file-name)
+			 (concat "<" (abbreviate-file-name (buffer-file-name)) ">")
 		       "")) "on " system-name))
 
 (Require 'imenu)
