@@ -4,6 +4,9 @@
 (prefer-coding-system 'utf-8)
 (setq default-input-method "MacOSX")
 
+;;(mac-set-input-method-parameter "com.google.inputmethod.Japanese.base" 'title "Ja")
+;;(mac-set-input-method-parameter "com.google.inputmethod.Japanese.Roman" 'title "En")
+
 ;; http://journal.mycom.co.jp/column/osx/079/index.html
 (setq exec-path (cons "/usr/local/bin" exec-path))
 (setenv "PATH"
@@ -34,8 +37,6 @@
 		 '(left . 10)
 		 '(cusor-type . (bar . 3))))))
 
-(setq default-frame-alist initial-frame-alist)
-
 (setq ring-bell-function '(lambda())) ;; no beep
 
 ;; macos specific
@@ -46,10 +47,7 @@
 (setq ns-alternate-modifier (quote super))
 
 ;; http://sourceforge.jp/projects/macemacsjp/lists/archive/users/2010-June/001671.html
-;;(mac-add-key-passed-to-system 'shift)
-
-;; http://molekun.blogspot.com/2011/03/homebrewemacs233.html
-;; (add-hook 'minibuffer-setup-hook 'mac-change-language-to-us)
+;; (mac-add-key-passed-to-system 'shift)
 
 (add-to-list 'auto-mode-alist
 	     '("\\.org$" . org-mode))
@@ -95,11 +93,11 @@
 	      (my-make-scratch 1))))
 
 (setq frame-title-format
-      '("[%+] %b " (:eval (if (buffer-file-name)
-			 (concat "<" (abbreviate-file-name (buffer-file-name)) ">")
-		       "")) "on " system-name))
+      '("[%*] "(:eval (if (buffer-file-name)
+			 (abbreviate-file-name (buffer-file-name))
+		       "%b")) " - Emacs " emacs-version " on " system-name))
 
-(Require 'imenu)
+(require 'imenu)
 (defcustom imenu-modes
   '(emacs-lisp-mode c-mode c++-mode makefile-mode org-mode)
   "List of major modes for which Imenu mode should be used."
@@ -122,18 +120,23 @@
  '(auto-save-default nil)
  '(auto-save-list-file-prefix nil)
  '(blink-cursor-blinks 4)
- '(blink-cursor-mode nil)
+ '(blink-cursor-mode t)
  '(calendar-week-start-day 1)
+ '(current-language-environment "Japanese")
+ '(default-input-method "MacOSX")
  '(display-time-24hr-format t)
  '(display-time-day-and-date t)
  '(display-time-default-load-average nil)
  '(display-time-format "%F %H:%M")
  '(display-time-load-average-threshold 100)
  '(display-time-mode t)
+ '(font-lock-global-modes (quote (not speedbar-mode)))
  '(global-whitespace-mode t)
  '(inhibit-startup-screen t)
  '(initial-scratch-message "")
  '(kill-whole-line t)
+ '(mac-auto-ascii-mode t)
+ '(mac-mouse-wheel-mode t)
  '(make-backup-files nil)
  '(org-agenda-files "~/Dropbox/org/agenda.org")
  '(org-directory "~/Dropbox/org")
@@ -141,6 +144,7 @@
  '(org-imenu-depth 3)
  '(org-startup-folded nil)
  '(org-startup-truncated nil)
+ '(recentf-exclude (quote ("^/[^/:]+:")))
  '(recentf-mode t)
  '(show-paren-mode t)
  '(show-paren-style (quote mixed))
@@ -154,7 +158,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#fffff0" :foreground "grey25" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 140 :width normal :foundry "nil" :family "Menlo"))))
+ '(default ((t (:inherit nil :stipple nil :background "white" :foreground "gray20" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 140 :width normal :foundry "nil" :family "Menlo"))))
  '(cursor ((t (:background "grey30"))))
  '(org-hide ((t (:foreground "gray75"))))
  '(whitespace-newline ((t (:foreground "LightSkyBlue"))))
@@ -162,7 +166,9 @@
 
 
 (set-fontset-font (frame-parameter nil 'font)
-                  'japanese-jisx0208
-                  (font-spec :family "Hiragino Kaku Gothic ProN"))
+		  'japanese-jisx0208
+		  (font-spec :family "Hiragino Kaku Gothic ProN"))
 (add-to-list 'face-font-rescale-alist
-             '(".*Hiragino Kaku Gothic ProN.*" . 1.2))
+	     '(".*Hiragino Kaku Gothic ProN.*" . 1.1))
+
+(setq default-frame-alist initial-frame-alist)
