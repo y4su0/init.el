@@ -1,43 +1,33 @@
+;; 日本語文字幅と英数字文字幅の確認日本語文字幅と英数字文字幅の確認日本語文字幅と英数字文字幅の確認
+;; abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqr
+
+;; 〇一二三四五六七八九〇一二三四五六七八九〇一二三四五六七八九〇一二三四五六七八九
+;; 01234567890123456789012345678901234567890123456789012345678901234567890123456789
+
 (cd "~/Dropbox")
-
-(set-language-environment 'Japanese)
-(prefer-coding-system 'utf-8)
-(setq default-input-method "MacOSX")
-
-;;(mac-set-input-method-parameter "com.google.inputmethod.Japanese.base" 'title "Ja")
-;;(mac-set-input-method-parameter "com.google.inputmethod.Japanese.Roman" 'title "En")
-
-;; http://journal.mycom.co.jp/column/osx/079/index.html
-(setq exec-path (cons "/usr/local/bin" exec-path))
-(setenv "PATH"
-	(concat '"/usr/local/bin:" (getenv "PATH")))
-
 (setq load-path
-      (append (list
-	       (expand-file-name "~/.emacs.d/elisp/")
-	       (expand-file-name "~/.emacs.d/elisp/org-8.3.3/lisp"))
+      (append (list (expand-file-name "~/.emacs.d/elisp/")
+		    (expand-file-name "~/.emacs.d/elpa/"))
 	      load-path))
+(setq exec-path (parse-colon-path (getenv "PATH")))
+(setq eshell-path-env (getenv "PATH"))
 
-;; machine-specific settings
-(when (equal system-name "iMac.local")
-  (setq initial-frame-alist
-	(append (list
-		 '(width . 120)
-		 '(height . 50)
-		 '(top . 300)
-		 '(left . 1200)
-		 '(cursor-type . (bar . 3))))))
+(define-key global-map [?¥] [?\\])  ;; ¥の代わりにバックスラッシュを入力する
 
-(when (equal system-name "MacBook-Air.local")
-  (setq initial-frame-alist
-	(append (list
-		 '(width . 120)
-		 '(height . 36)
-		 '(top . 30)
-		 '(left . 10)
-		 '(cusor-type . (bar . 3))))))
+(require 'package)
+(package-initialize)
 
-(setq ring-bell-function '(lambda())) ;; no beep
+(require 'helm-config)
+(require 'migemo)
+
+(require 'org)
+
+(require 'scratch-ext)
+
+(require 'japanese-holidays)
+(setq calendar-holidays japanese-holidays)
+
+(require 'imenu)
 
 ;; macos specific
 (define-key global-map [ns-drag-file] 'ns-find-file)
@@ -49,55 +39,26 @@
 ;; http://sourceforge.jp/projects/macemacsjp/lists/archive/users/2010-June/001671.html
 ;; (mac-add-key-passed-to-system 'shift)
 
-(add-to-list 'auto-mode-alist
-	     '("\\.org$" . org-mode))
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
+;; キーバインドいろいろ
+(global-set-key (kbd "C-c l") 'org-store-link)
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c b") 'org-iswitchb)
 
-;; http://mobileorg.ncogni.to/doc/getting-started/using-dropbox/
+(global-set-key (kbd "C-x b") 'helm-for-files)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
 
-;; for w3m
-;; (require 'w3m-load)
-
-;; for twittering-mode
-;; (require 'twittering-mode)
-
-;;; *scratch* buffer
-(defun my-make-scratch (&optional arg)
-  (interactive)
-  (progn
-    ;; make "*scratch*" buffer at buffer-list
-    (set-buffer (get-buffer-create "*scratch*"))
-    (funcall initial-major-mode)
-    (erase-buffer)
-    (when (and initial-scratch-message (not inhibit-startup-message))
-      (insert initial-scratch-message))
-    (or arg (progn (setq arg 0)
-		   (switch-to-buffer "*scratch*")))
-    (cond ((= arg 0) (message "*scratch* is cleared up."))
-	  ((= arg 1) (message "another *scratch* is created")))))
-
-(add-hook 'kill-buffer-query-functions
-	  ;; delete contents when *scratch* buffer is killed
-	  (lambda ()
-	    (if (string= "*scratch*" (buffer-name))
-		(progn (my-make-scratch 0) nil)
-	      t)))
-
-(add-hook 'after-save-hook
-	  ;; new *scratch* buffer after saving *scratch*
-	  (lambda ()
-	    (unless (member (get-buffer "*scratch*") (buffer-list))
-	      (my-make-scratch 1))))
+(global-set-key (kbd "M-z") 'undo)
+(global-set-key (kbd "C-c g") 'imenu)
+(global-set-key (kbd "C-z") 'ignore)
 
 (setq frame-title-format
       '("[%*] "(:eval (if (buffer-file-name)
 			 (abbreviate-file-name (buffer-file-name))
 		       "%b")) " - Emacs " emacs-version " on " system-name))
 
-(require 'imenu)
 (defcustom imenu-modes
   '(emacs-lisp-mode c-mode c++-mode makefile-mode org-mode)
   "List of major modes for which Imenu mode should be used."
@@ -110,65 +71,8 @@
       (imenu-add-to-menubar "imenu")))
 (add-hook 'find-file-hooks 'my-imenu-ff-hook t)
 
-(global-set-key "\C-cg" 'imenu)
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(auto-save-default nil)
- '(auto-save-list-file-prefix nil)
- '(blink-cursor-blinks 4)
- '(blink-cursor-mode t)
- '(calendar-week-start-day 1)
- '(current-language-environment "Japanese")
- '(default-input-method "MacOSX")
- '(display-time-24hr-format t)
- '(display-time-day-and-date t)
- '(display-time-default-load-average nil)
- '(display-time-format "%F %H:%M")
- '(display-time-load-average-threshold 100)
- '(display-time-mode t)
- '(font-lock-global-modes (quote (not speedbar-mode)))
- '(global-whitespace-mode t)
- '(inhibit-startup-screen t)
- '(initial-scratch-message "")
- '(kill-whole-line t)
- '(mac-auto-ascii-mode t)
- '(mac-mouse-wheel-mode t)
- '(make-backup-files nil)
- '(org-agenda-files "~/Dropbox/org/agenda.org")
- '(org-directory "~/Dropbox/org")
- '(org-hide-leading-stars t)
- '(org-imenu-depth 3)
- '(org-startup-folded nil)
- '(org-startup-truncated nil)
- '(recentf-exclude (quote ("^/[^/:]+:")))
- '(recentf-mode t)
- '(show-paren-mode t)
- '(show-paren-style (quote mixed))
- '(tool-bar-mode nil)
- '(which-function-mode t)
- '(whitespace-line-column 200)
- '(whitespace-style (quote (face tabs newline tab-mark newline-mark))))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "white" :foreground "gray20" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 140 :width normal :foundry "nil" :family "Menlo"))))
- '(cursor ((t (:background "grey30"))))
- '(org-hide ((t (:foreground "gray75"))))
- '(whitespace-newline ((t (:foreground "LightSkyBlue"))))
- '(whitespace-tab ((t (:foreground "LightSkyBlue")))))
-
-
-(set-fontset-font (frame-parameter nil 'font)
-		  'japanese-jisx0208
-		  (font-spec :family "Hiragino Kaku Gothic ProN"))
-(add-to-list 'face-font-rescale-alist
-	     '(".*Hiragino Kaku Gothic ProN.*" . 1.1))
+(setq custom-file "~/.emacs.d/emacs-custom.el")
+(load custom-file)
 
 (setq default-frame-alist initial-frame-alist)
+
